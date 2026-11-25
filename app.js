@@ -42,6 +42,7 @@ const remDays=()=>(S.settings&&+S.settings.remind)||3;
 const monthDue=m=>S.sessions.filter(s=>s.date.slice(0,7)===m).reduce((x,s)=>x+s.price,0)-S.payments.filter(s=>s.date.slice(0,7)===m).reduce((x,s)=>x+s.amount,0);
 const clsName=id=>(S.classes.find(c=>c.id===id)||{name:'Lớp đã xóa'}).name;
 function groups(m){const g={};
+ S.classes.forEach(c=>{g[c.id]={cid:c.id,name:c.name,n:0,tot:0,paid:0}});
  S.sessions.filter(s=>s.date.slice(0,7)===m).forEach(s=>{const x=g[s.cid]||(g[s.cid]={cid:s.cid,name:s.name,n:0,tot:0,paid:0});x.n++;x.tot+=s.price});
  S.payments.filter(p=>p.date.slice(0,7)===m).forEach(p=>{const k=p.cid||'_';const x=g[k]||(g[k]={cid:k,name:p.cid?clsName(p.cid):'Chưa phân lớp',n:0,tot:0,paid:0});x.paid+=p.amount});
  const ix=x=>{const i=S.classes.findIndex(c=>c.id===x.cid);return i<0?99:i};return Object.values(g).sort((a,b)=>ix(a)-ix(b))}
