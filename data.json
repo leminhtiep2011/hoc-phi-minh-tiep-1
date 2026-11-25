@@ -50,7 +50,15 @@
    ]
   }
  ],
- "sessions": [],
+ "sessions": [
+  {
+   "id": "2hmsa33",
+   "cid": "anh",
+   "name": "Tiếng Anh",
+   "price": 80000,
+   "date": "2026-11-02"
+  }
+ ],
  "payments": [],
  "settings": {
   "remind": 3
