@@ -1,0 +1,44 @@
+:root{--bg:#f3f5f9;--card:#fff;--tx:#0f1729;--mu:#5d6779;--ac:#2456e5;--ac2:#e7edfc;--bd:#e1e5ed;--on:#fff;--bad:#d4281c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:22px 16px 56px}
+h1{font-size:25px;letter-spacing:-.02em;margin:0 0 4px}
+h2{font-size:15px;margin:0 0 6px}
+.mu{color:var(--mu);font-size:14px}.mid{padding:48px 0;text-align:center}
+.lk{color:var(--ac);font-size:14px;font-weight:600;text-decoration:none}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px;margin-top:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;padding:10px 14px;transition:transform .12s}
+button:active{transform:scale(.97)}
+button.p{background:var(--ac);color:var(--on);border-color:var(--ac);font-weight:600}
+button.big{width:100%;padding:19px;font-size:18px;border-radius:14px;margin-top:12px}
+button.g{border:none;background:none;color:var(--ac);padding:6px 8px;font-weight:600}
+button.x{border:none;background:none;color:var(--mu);padding:6px 10px}
+.mn{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.mn b{font-size:18px}.mn button{width:42px;height:42px;border-radius:50%;padding:0;font-size:20px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg);border-radius:16px;padding:12px 14px}
+.stat span{display:block;font-size:13px;color:var(--mu)}
+.stat b{font-size:19px;font-variant-numeric:tabular-nums}
+.stat.due{grid-column:1/-1;background:var(--ac);color:var(--on);padding:18px}
+.stat.due span{color:inherit;opacity:.85}.stat.due b{font-size:32px;letter-spacing:-.02em}
+.stat.due.ok{background:var(--ac2);color:var(--tx)}
+.item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-top:1px solid var(--bd)}
+.item:first-of-type{border-top:none}
+.item .l{display:flex;align-items:center;gap:12px}
+.item .row span{font-weight:600;font-variant-numeric:tabular-nums}
+.dtb{width:46px;height:52px;border-radius:14px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;background:hsl(var(--h) 45% 93%);color:hsl(var(--h) 55% 30%)}
+.dtb b{font-size:19px}.dtb span{font-size:11px;font-weight:600;text-transform:uppercase}
+.cls{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:4px 0 6px}
+.cap{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ac)}
+input,select{font:inherit;width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)}
+input:focus,select:focus{outline:2px solid var(--ac);outline-offset:1px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.sh{position:fixed;inset:0;background:rgba(15,23,41,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sh>div{background:var(--card);width:100%;max-width:520px;max-height:88%;overflow:auto;border-radius:26px 26px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0))}
+.pick{display:block;width:100%;text-align:left;margin-top:8px;border-radius:16px;padding:12px 14px}
+.pick.on{border-color:var(--ac);background:var(--ac2)}
+.sl{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:6px;margin-top:6px;align-items:center}
+.t{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:999px;z-index:40;font-size:14px;max-width:90%}
+.alert{background:#fff4e5;border:1px solid #f1d49b;color:#6b3f00;border-radius:16px;padding:14px 16px;margin-top:14px;font-size:14px}
+.alert b{display:block;font-size:15px;margin-bottom:4px}
