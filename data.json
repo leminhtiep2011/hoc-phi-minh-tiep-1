@@ -1,1 +1,66 @@
-{"classes": [{"id": "ly", "name": "Vật lý", "place": "Trung Tâm Nam Anh", "price": 80000, "slots": [{"d": 4, "s": "18:00", "e": "20:00"}]}, {"id": "toan", "name": "Toán", "place": "Trung Tâm Nam Anh", "price": 80000, "slots": [{"d": 2, "s": "18:00", "e": "20:00"}, {"d": 5, "s": "18:00", "e": "20:00"}, {"d": 6, "s": "14:30", "e": "16:30"}]}, {"id": "anh", "name": "Tiếng Anh", "place": "Cô Lý", "price": 80000, "slots": [{"d": 1, "s": "18:00", "e": "20:00"}]}], "sessions": [], "payments": [], "settings": {"remind": 3}}
+{
+ "classes": [
+  {
+   "id": "ly",
+   "name": "Vật lý",
+   "place": "Trung Tâm Nam Anh",
+   "price": 80000,
+   "slots": [
+    {
+     "d": 4,
+     "s": "18:00",
+     "e": "20:00"
+    }
+   ]
+  },
+  {
+   "id": "toan",
+   "name": "Toán",
+   "place": "Trung Tâm Nam Anh",
+   "price": 80000,
+   "slots": [
+    {
+     "d": 2,
+     "s": "18:00",
+     "e": "20:00"
+    },
+    {
+     "d": 5,
+     "s": "18:00",
+     "e": "20:00"
+    },
+    {
+     "d": 6,
+     "s": "14:30",
+     "e": "16:30"
+    }
+   ]
+  },
+  {
+   "id": "anh",
+   "name": "Tiếng Anh",
+   "place": "Cô Lý",
+   "price": 80000,
+   "slots": [
+    {
+     "d": 1,
+     "s": "18:00",
+     "e": "20:00"
+    }
+   ]
+  }
+ ],
+ "sessions": [
+  {
+   "id": "7j7cvcg",
+   "cid": "ly",
+   "name": "Vật lý",
+   "price": 80000,
+   "date": "2026-11-26"
+  }
+ ],
+ "payments": [],
+ "settings": {
+  "remind": 3
+ }
+}
