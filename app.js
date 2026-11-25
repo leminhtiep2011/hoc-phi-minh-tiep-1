@@ -40,8 +40,16 @@ const fmtD=s=>s.split('-').reverse().join('/');
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1),mname=m=>{const a=m.split('-');return 'tháng '+(+a[1])+'/'+a[0]};
 const remDays=()=>(S.settings&&+S.settings.remind)||3;
 const monthDue=m=>S.sessions.filter(s=>s.date.slice(0,7)===m).reduce((x,s)=>x+s.price,0)-S.payments.filter(s=>s.date.slice(0,7)===m).reduce((x,s)=>x+s.amount,0);
+const clsName=id=>(S.classes.find(c=>c.id===id)||{name:'Lớp đã xóa'}).name;
+function groups(m){const g={};
+ S.sessions.filter(s=>s.date.slice(0,7)===m).forEach(s=>{const x=g[s.cid]||(g[s.cid]={cid:s.cid,name:s.name,n:0,tot:0,paid:0});x.n++;x.tot+=s.price});
+ S.payments.filter(p=>p.date.slice(0,7)===m).forEach(p=>{const k=p.cid||'_';const x=g[k]||(g[k]={cid:k,name:p.cid?clsName(p.cid):'Chưa phân lớp',n:0,tot:0,paid:0});x.paid+=p.amount});
+ const ix=x=>{const i=S.classes.findIndex(c=>c.id===x.cid);return i<0?99:i};return Object.values(g).sort((a,b)=>ix(a)-ix(b))}
 function alerts(){const now=new Date(),cm=ymd(now).slice(0,7),left=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate(),out=[];
- [...new Set(S.sessions.map(s=>s.date.slice(0,7)))].sort().forEach(m=>{const d=monthDue(m);if(d<=0)return;if(m<cm)out.push({m,d,late:1});else if(m===cm&&left<=remDays())out.push({m,d,left})});return out}
+ [...new Set(S.sessions.map(s=>s.date.slice(0,7)))].sort().forEach(m=>groups(m).forEach(g=>{const d=g.tot-g.paid;if(d<=0||g.cid==='_')return;if(m<cm)out.push({m,d,late:1,name:g.name});else if(m===cm&&left<=remDays())out.push({m,d,left,name:g.name})}));return out}
+function classCard(){const g=groups(month);if(!g.length)return '';
+ return '<div class="card"><h2>Theo từng lớp</h2>'+g.map(x=>{const d=x.tot-x.paid,pl=(S.classes.find(c=>c.id===x.cid)||{}).place;
+  return '<div class="item"><div class="l"><div class="dtb" style="--h:'+hue(x.cid)+'"><b>'+x.n+'</b><span>buổi</span></div><div><b>'+esc(x.name)+'</b><div class="mu">'+(pl?esc(pl)+' · ':'')+'Tổng '+money(x.tot)+' · Đã đóng '+money(x.paid)+'</div></div></div><div style="text-align:right;flex:none">'+(d>0?'<b>'+money(d)+'</b><div class="mu">còn phải đóng</div>':d<0?'<b>'+money(-d)+'</b><div class="mu">đóng dư</div>':'<b style="color:var(--ac)">Đã đủ</b>')+'</div></div>'}).join('')+'</div>'}
 const A=window.A={
  mshift(n){const a=month.split('-'),d=new Date(+a[0],+a[1]-1+n,1);month=d.getFullYear()+'-'+p2(d.getMonth()+1);armed=null;render()},
  setDate(v){selDate=v||selDate},
@@ -52,9 +60,9 @@ const A=window.A={
  open(s){sheet=s;render()},close(){sheet=null;render()},
  del(k,id){const key=k+id;if(armed!==key){armed=key;render();return}armed=null;
   if(k==='s')S.sessions=S.sessions.filter(x=>x.id!==id);else S.payments=S.payments.filter(x=>x.id!==id);commit()},
- openPay(){E={date:ymd(new Date()),amount:'',note:''};sheet='pay';render()},
+ openPay(){const c=cur().c;E={date:ymd(new Date()),amount:'',note:'',cid:c?c.id:''};sheet='pay';render()},
  savePay(){const a=+E.amount;if(!(a>0)){flash('Nhập số tiền');return}
-  S.payments.push({id:uid(),date:E.date||ymd(new Date()),amount:a,note:E.note||''});month=(E.date||ymd(new Date())).slice(0,7);sheet=null;commit()},
+  S.payments.push({id:uid(),date:E.date||ymd(new Date()),amount:a,note:E.note||'',cid:E.cid||''});month=(E.date||ymd(new Date())).slice(0,7);sheet=null;commit()},
  openCls(id){const c=S.classes.find(x=>x.id===id);E=c?JSON.parse(JSON.stringify(c)):{id:null,name:'',place:'',price:80000,slots:[]};sheet='cls';render()},
  addSlot(){E.slots.push({d:1,s:'18:00',e:'20:00'});render()},rmSlot(i){E.slots.splice(i,1);render()},
  saveCls(){if(!E.name.trim()||!(+E.price>0)){flash('Cần tên lớp và đơn giá');return}
@@ -74,18 +82,18 @@ function render(){
  const del=(k,id)=>ed?'<button class="x" onclick="A.del(\''+k+'\',\''+id+'\')">'+(armed===k+id?'Xóa?':'✕')+'</button>':'';
  let h=ed?'<div class="row"><h1>Điểm danh</h1><a class="lk" href="index.html" target="_blank">Trang phụ huynh ↗</a></div>'+(LOCAL?'<div class="mu">Đang chạy thử trên máy này, chưa kết nối GitHub.</div>':''):'<h1>Học phí và buổi học</h1><div class="mu">Dành cho phụ huynh</div>';
  const al=alerts();
- if(al.length)h+='<div class="alert"><b>'+(al.some(x=>x.late)?'Cần đóng học phí':'Sắp đến hạn đóng học phí')+'</b>'+al.map(x=>'<div>'+cap(mname(x.m))+': còn '+money(x.d)+(x.late?' (đã quá hạn)':x.left===0?' (hôm nay là hạn cuối)':' (còn '+x.left+' ngày)')+'</div>').join('')+'</div>';
+ if(al.length)h+='<div class="alert"><b>'+(al.some(x=>x.late)?'Cần đóng học phí':'Sắp đến hạn đóng học phí')+'</b>'+al.map(x=>'<div>'+cap(mname(x.m))+' · '+esc(x.name)+': còn '+money(x.d)+(x.late?' (đã quá hạn)':x.left===0?' (hôm nay là hạn cuối)':' (còn '+x.left+' ngày)')+'</div>').join('')+'</div>';
  if(ed&&c)h+='<div class="card"><div class="cap">'+(r.none?'Hôm nay không có lớp theo lịch':r.auto?'Lớp theo lịch hiện tại':'Lớp đã chọn')+'</div><div class="cls">'+esc(c.name)+'</div><div class="mu">'+esc(c.place)+' · '+money(c.price)+'/buổi<br>'+slotTxt(c)+'</div><label>Ngày học</label><input type="date" value="'+selDate+'" onchange="A.setDate(this.value)"><button class="p big" onclick="A.attend()">Điểm danh ngay</button><button class="g" style="margin-top:8px;width:100%" onclick="A.open(\'pick\')">Chọn lớp khác</button></div>';
  h+='<div class="mn"><button onclick="A.mshift(-1)">‹</button><b>Tháng '+(+a[1])+'/'+a[0]+'</b><button onclick="A.mshift(1)">›</button></div>'
   +'<div class="card" style="margin-top:10px"><div class="stats"><div class="stat"><span>Số buổi</span><b>'+ses.length+'</b></div><div class="stat"><span>Tổng học phí</span><b>'+money(tot)+'</b></div><div class="stat"><span>Đã đóng</span><b>'+money(paid)+'</b></div><div class="stat due'+(due<=0?' ok':'')+'"><span>'+(due<0?'Đóng dư':'Còn phải đóng')+'</span><b>'+money(Math.abs(due))+'</b></div></div></div>'
-  +'<div class="card"><h2>Các buổi đã học</h2>'+(ses.length?ses.map(s=>'<div class="item"><div class="l">'+badge(s)+'<div><b>'+esc(s.name)+'</b><div class="mu">'+fmtD(s.date)+'</div></div></div><div class="row"><span>'+money(s.price)+'</span>'+del('s',s.id)+'</div></div>').join(''):'<div class="mu">Chưa có buổi nào trong tháng này.</div>')+'</div>'
-  +'<div class="card"><div class="row"><h2>Tiền đã đóng</h2>'+(ed?'<button class="g" onclick="A.openPay()">+ Ghi nhận</button>':'')+'</div>'+(pay.length?pay.map(s=>'<div class="item"><div><b>'+money(s.amount)+'</b><div class="mu">'+fmtD(s.date)+(s.note?' · '+esc(s.note):'')+'</div></div>'+del('p',s.id)+'</div>').join(''):'<div class="mu">Chưa ghi nhận khoản nào.</div>')+'</div>'
+  +classCard()+'<div class="card"><h2>Các buổi đã học</h2>'+(ses.length?ses.map(s=>'<div class="item"><div class="l">'+badge(s)+'<div><b>'+esc(s.name)+'</b><div class="mu">'+fmtD(s.date)+'</div></div></div><div class="row"><span>'+money(s.price)+'</span>'+del('s',s.id)+'</div></div>').join(''):'<div class="mu">Chưa có buổi nào trong tháng này.</div>')+'</div>'
+  +'<div class="card"><div class="row"><h2>Tiền đã đóng</h2>'+(ed?'<button class="g" onclick="A.openPay()">+ Ghi nhận</button>':'')+'</div>'+(pay.length?pay.map(s=>'<div class="item"><div><b>'+money(s.amount)+'</b><div class="mu">'+fmtD(s.date)+(s.cid?' · '+esc(clsName(s.cid)):'')+(s.note?' · '+esc(s.note):'')+'</div></div>'+del('p',s.id)+'</div>').join(''):'<div class="mu">Chưa ghi nhận khoản nào.</div>')+'</div>'
   +'<div class="card"><div class="row"><h2>Lớp học và lịch</h2>'+(ed?'<button class="g" onclick="A.openCls(null)">+ Thêm lớp</button>':'')+'</div>'+S.classes.map(k=>'<div class="item"><div><b>'+esc(k.name)+'</b> · '+money(k.price)+'<div class="mu">'+esc(k.place)+'<br>'+slotTxt(k)+'</div></div>'+(ed?'<button class="g" onclick="A.openCls(\''+k.id+'\')">Sửa</button>':'')+'</div>').join('')+'</div>';
   if(ed&&!LOCAL)h+='<button class="g" style="margin-top:14px" onclick="A.logout()">Đổi mã GitHub</button>';
  if(busy)h+='<div class="t">Đang lưu…</div>';
  const sh=(inner)=>'<div class="sh" onclick="if(event.target===this)A.close()"><div>'+inner+'</div></div>';
  if(sheet==='pick')h+=sh('<h2>Chọn lớp</h2>'+S.classes.map(k=>'<button class="pick'+(c&&c.id===k.id?' on':'')+'" onclick="A.pickC(\''+k.id+'\')"><b>'+esc(k.name)+'</b><div class="mu">'+esc(k.place)+' · '+slotTxt(k)+'</div></button>').join(''));
- if(sheet==='pay')h+=sh('<h2>Ghi nhận tiền đã đóng</h2><label>Số tiền (đ)</label><input type="number" inputmode="numeric" value="'+esc(E.amount)+'" oninput="E.amount=this.value"><label>Ngày đóng</label><input type="date" value="'+E.date+'" oninput="E.date=this.value"><label>Ghi chú</label><input value="'+esc(E.note)+'" oninput="E.note=this.value"><button class="p big" onclick="A.savePay()">Lưu</button>');
+ if(sheet==='pay')h+=sh('<h2>Ghi nhận tiền đã đóng</h2><label>Đóng cho lớp</label><select onchange="E.cid=this.value">'+S.classes.map(k=>'<option value="'+k.id+'"'+(E.cid===k.id?' selected':'')+'>'+esc(k.name)+' · '+esc(k.place)+'</option>').join('')+'</select><label>Số tiền (đ)</label><input type="number" inputmode="numeric" value="'+esc(E.amount)+'" oninput="E.amount=this.value"><label>Ngày đóng</label><input type="date" value="'+E.date+'" oninput="E.date=this.value"><label>Ghi chú</label><input value="'+esc(E.note)+'" oninput="E.note=this.value"><button class="p big" onclick="A.savePay()">Lưu</button>');
  if(sheet==='cls')h+=sh('<h2>'+(E.id?'Sửa lớp':'Thêm lớp')+'</h2><label>Tên lớp / môn</label><input value="'+esc(E.name)+'" oninput="E.name=this.value"><label>Nơi học / giáo viên</label><input value="'+esc(E.place)+'" oninput="E.place=this.value"><label>Đơn giá mỗi buổi (đ)</label><input type="number" inputmode="numeric" value="'+esc(E.price)+'" oninput="E.price=this.value"><label>Lịch học</label>'
   +E.slots.map((s,i)=>'<div class="sl"><select onchange="E.slots['+i+'].d=+this.value">'+DN.map((n,d)=>'<option value="'+d+'"'+(s.d===d?' selected':'')+'>'+n+'</option>').join('')+'</select><input type="time" value="'+s.s+'" oninput="E.slots['+i+'].s=this.value"><input type="time" value="'+s.e+'" oninput="E.slots['+i+'].e=this.value"><button class="x" onclick="A.rmSlot('+i+')">✕</button></div>').join('')
   +'<button class="g" onclick="A.addSlot()">+ Thêm giờ học</button><button class="p big" onclick="A.saveCls()">Lưu lớp</button>'+(E.id?'<button class="g" style="width:100%;color:var(--bad)" onclick="A.delCls()">Xóa lớp này</button>':''));
