@@ -20,3 +20,6 @@ Dữ liệu nằm trong `data.json` của repo, mỗi lần điểm danh là m�
 
 ## Nhắc đóng tiền
 Cả hai trang tự hiện khung màu cam khi còn 3 ngày nữa là cuối tháng mà còn thiếu tiền, hoặc khi tháng trước còn thiếu. Muốn đổi số ngày báo trước, sửa `"remind"` trong `data.json`.
+
+## Theo từng lớp
+Mỗi lớp có phần tổng kết riêng (số buổi, tổng, đã đóng, còn phải đóng, nơi đóng). Khi ghi nhận tiền đã đóng, bạn chọn đóng cho lớp nào để số liệu tách đúng theo từng nơi.
