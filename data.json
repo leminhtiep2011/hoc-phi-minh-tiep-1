@@ -141,6 +141,13 @@
    "name": "Vật lý",
    "price": 80000,
    "date": "2026-11-26"
+  },
+  {
+   "id": "tm63zxx",
+   "cid": "toan",
+   "name": "Toán",
+   "price": 80000,
+   "date": "2026-11-27"
   }
  ],
  "payments": [
