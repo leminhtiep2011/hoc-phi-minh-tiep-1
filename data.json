@@ -143,7 +143,15 @@
    "date": "2026-11-26"
   }
  ],
- "payments": [],
+ "payments": [
+  {
+   "id": "rz175nb",
+   "date": "2026-11-26",
+   "amount": 320000,
+   "note": "",
+   "cid": "anh"
+  }
+ ],
  "settings": {
   "remind": 3
  }
